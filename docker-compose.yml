@@ -1,0 +1,22 @@
+services:
+    db:
+        image: mysql:8.0-debian
+        restart: on-failure
+        container_name: library_database
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: library_database
+            MYSQL_USER: main
+            MYSQL_PASSWORD: main
+        ports:
+            - "3306:3306"
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+          - library_network
+volumes:
+    db_data:
+networks:
+  library_network:
+    name: library_network
+    driver: bridge
