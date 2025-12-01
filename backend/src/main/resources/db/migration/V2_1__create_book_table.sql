@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS book (
     quantity int not null,
     price float(10, 2) not null,
     author_id bigint,
-    REFERENCES author(author_id)
-    ON DELETE CASCADE,
+    FOREIGN KEY (author_id)  REFERENCES author(id)
+    ON DELETE CASCADE
     ON UPDATE CASCADE
-)
+);
