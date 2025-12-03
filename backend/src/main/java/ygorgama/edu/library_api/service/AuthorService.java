@@ -2,7 +2,9 @@ package ygorgama.edu.library_api.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ygorgama.edu.library_api.dto.AuthorDTO;
 import ygorgama.edu.library_api.exception.NotFoundException;
+import ygorgama.edu.library_api.mapper.AuthorMapper;
 import ygorgama.edu.library_api.model.Author;
 import ygorgama.edu.library_api.repository.AuthorRepository;
 
@@ -13,26 +15,34 @@ public class AuthorService {
     @Autowired
     private AuthorRepository authorRepository;
 
-    public List<Author> findAll(){
-        return authorRepository.findAll();
+    public List<AuthorDTO> findAll(){
+        return AuthorMapper.INSTANCE.authorListToAuthorDtoList(authorRepository.findAll());
     }
 
-    public Author findById(Long id){
-        return authorRepository.findById(id).orElseThrow(() -> new NotFoundException("Author not found"));
+    public AuthorDTO findById(Long id){
+        Author entity =  authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Author not found"));
+        return AuthorMapper.INSTANCE.authorToAuthorDto(entity);
     }
 
-    public Author create(Author author){
-        return authorRepository.save(author);
+    public AuthorDTO create(AuthorDTO author){
+        Author entity = authorRepository.save(
+                AuthorMapper.INSTANCE.authorDtoToAuthor(author)
+        );
+
+        return AuthorMapper.INSTANCE.authorToAuthorDto(entity);
     }
 
-    public Author update(Author author){
+    public AuthorDTO update(AuthorDTO author){
         Author entity = authorRepository.findById(author.getId())
                 .orElseThrow(() -> new NotFoundException("Author not found"));
 
         entity.setFirstName(author.getFirstName());
         entity.setLastName(author.getLastName());
 
-        return entity;
+        authorRepository.save(entity);
+
+        return AuthorMapper.INSTANCE.authorToAuthorDto(entity);
     }
 
     public void delete(Long id){
@@ -42,5 +52,4 @@ public class AuthorService {
 
         authorRepository.delete(entity);
     }
-
 }

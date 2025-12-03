@@ -5,11 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
+import ygorgama.edu.library_api.dto.AuthorDTO;
+import ygorgama.edu.library_api.mapper.AuthorMapper;
 import ygorgama.edu.library_api.model.Author;
 import ygorgama.edu.library_api.service.AuthorService;
 
 import java.net.URI;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("api/v1/author")
@@ -17,37 +21,35 @@ public class AuthorController {
     @Autowired
     private AuthorService service;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthorController.class);
+
     @GetMapping
-    public List<Author> findAll(){
+    public List<AuthorDTO> findAll(){
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public Author find(@PathVariable Long id){
+    public AuthorDTO find(@PathVariable Long id){
+        logger.info("Find author by ID");
         return service.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Author> create(@RequestBody Author author){
-        Author entity = service.create(author);
+    public ResponseEntity<AuthorDTO> create(@RequestBody AuthorDTO author){
+        AuthorDTO authorCreated = service.create(author);
         URI authorURI = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-        return ResponseEntity.created(authorURI).body(entity);
+                .buildAndExpand(authorCreated.getId()).toUri();
+        return ResponseEntity.created(authorURI).body(authorCreated);
     }
 
     @PutMapping
-    public  ResponseEntity<Author> update(@RequestBody Author author)
+    public  ResponseEntity<AuthorDTO> update(@RequestBody AuthorDTO author)
     {
-        Author entity = service.update(author);
+        AuthorDTO authorUpdated = service.update(author);
 
-        URI authorURI = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(entity.getId()).toUri();
-
-        return ResponseEntity.ok().body(author);
+        return ResponseEntity.ok().body(authorUpdated);
     }
 
     @DeleteMapping("/{id}")
